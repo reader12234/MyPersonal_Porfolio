@@ -22,163 +22,82 @@
       line-height: 1.5;
     }
 
-    .container {
-      max-width: 1000px;
-      margin: 32px auto;
-      padding: 24px;
-    }
+    .container { max-width: 1000px; margin: 32px auto; padding: 24px; }
 
     /* Header */
-    header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    header strong {
-      font-size: 18px;
-    }
-    nav a {
-      color: var(--muted);
-      text-decoration: none;
-      margin-left: 18px;
-      font-weight: 600;
-    }
-    .links a {
-      margin-right: 10px;
-      color: var(--muted);
-      text-decoration: none;
-    }
+    header { display: flex; align-items: center; justify-content: space-between; }
+    header strong { font-size: 18px; }
+    nav a { color: var(--muted); text-decoration: none; margin-left: 18px; font-weight: 600; }
+    .links a { margin-right: 10px; color: var(--muted); text-decoration: none; }
 
     /* Hero */
-    .hero {
-      display: flex;
-      gap: 28px;
-      align-items: center;
-      margin-top: 28px;
-      flex-wrap: wrap;
-    }
+    .hero { display: flex; gap: 28px; align-items: center; margin-top: 28px; flex-wrap: wrap; }
     .avatar {
-      width: 140px;
-      height: 140px;
-      border-radius: 12px;
-      flex: 0 0 140px;
-      background: linear-gradient(135deg, #0ea5a4, #4f46e5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 28px;
-      color: #fff;
+      width: 140px; height: 140px; border-radius: 12px;
+      flex: 0 0 140px; background: linear-gradient(135deg, #0ea5a4, #4f46e5);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 28px; color: #fff;
     }
-    .hero h1 {
-      margin: 0;
-      font-size: 28px;
-    }
-    .hero p {
-      margin: 6px 0;
-      color: var(--muted);
-    }
-    .hero .details {
-      max-width: 680px;
-    }
-    .contact-info {
-      margin-top: 8px;
-      color: var(--muted);
-      font-size: 14px;
-    }
-    .contact-info a {
-      color: inherit;
-      text-decoration: underline;
-    }
+    .hero h1 { margin: 0; font-size: 28px; }
+    .hero p { margin: 6px 0; color: var(--muted); }
+    .hero .details { max-width: 680px; }
+    .contact-info { margin-top: 8px; color: var(--muted); font-size: 14px; }
+    .contact-info a { color: inherit; text-decoration: underline; }
 
     /* Sections */
     .section {
       background: rgba(255, 255, 255, 0.03);
-      padding: 18px;
-      border-radius: 12px;
-      margin-top: 18px;
+      padding: 18px; border-radius: 12px; margin-top: 18px;
     }
-
-    .two-col {
-      display: grid;
-      grid-template-columns: 1fr 320px;
-      gap: 18px;
-      margin-top: 20px;
-    }
+    .two-col { display: grid; grid-template-columns: 1fr 320px; gap: 18px; margin-top: 20px; }
 
     /* Skills */
     .skills .skill { margin-bottom: 10px; }
-    .skill .label {
-      display: flex;
-      justify-content: space-between;
-      font-weight: 600;
-      color: #cfe8ff;
-    }
-    .progress {
-      height: 10px;
-      background: rgba(255, 255, 255, 0.08);
-      border-radius: 999px;
-      overflow: hidden;
-    }
-    .progress > i {
-      display: block;
-      height: 100%;
-      background: linear-gradient(90deg, var(--accent), #06b6d4);
-    }
+    .skill .label { display: flex; justify-content: space-between; font-weight: 600; color: #cfe8ff; }
+    .progress { height: 10px; background: rgba(255, 255, 255, 0.08); border-radius: 999px; overflow: hidden; }
+    .progress > i { display: block; height: 100%; background: linear-gradient(90deg, var(--accent), #06b6d4); }
 
     /* Timeline */
-    .timeline {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
+    .timeline { list-style: none; padding: 0; margin: 0; }
     .timeline li {
-      padding: 12px 0;
-      border-left: 2px dashed rgba(255, 255, 255, 0.04);
-      margin-left: 12px;
-      position: relative;
+      padding: 12px 0; border-left: 2px dashed rgba(255, 255, 255, 0.04);
+      margin-left: 12px; position: relative;
     }
     .timeline li::before {
-      content: "";
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: var(--accent);
-      position: absolute;
-      left: -7px;
-      top: 12px;
+      content: ""; width: 12px; height: 12px; border-radius: 50%;
+      background: var(--accent); position: absolute; left: -7px; top: 12px;
     }
 
     /* Contact Form */
-    .contact form {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
+    .contact form { display: flex; flex-direction: column; gap: 8px; }
     input, textarea {
-      background: transparent;
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      padding: 10px;
-      border-radius: 8px;
-      color: inherit;
+      background: transparent; border: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 10px; border-radius: 8px; color: inherit;
     }
     button {
-      background: var(--accent);
-      border: none;
-      padding: 10px 14px;
-      border-radius: 8px;
-      color: white;
-      font-weight: 700;
-      cursor: pointer;
+      background: var(--accent); border: none; padding: 10px 14px;
+      border-radius: 8px; color: white; font-weight: 700; cursor: pointer;
     }
 
     /* Footer */
-    footer {
-      text-align: center;
-      color: var(--muted);
-      margin-top: 22px;
-      font-size: 13px;
+    footer { text-align: center; color: var(--muted); margin-top: 22px; font-size: 13px; }
+
+    /* Projects (text only) */
+    .project-list { margin-top: 1rem; }
+    .project-item {
+      margin-bottom: 20px;
+      padding: 15px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 8px;
+      border-left: 4px solid var(--accent);
     }
+    .project-item h3 { margin: 0 0 8px 0; font-size: 18px; color: #fff; }
+    .project-item p { margin: 0 0 10px 0; font-size: 14px; color: var(--muted); }
+    .btn {
+      display:inline-block; padding:.4rem .8rem;
+      border-radius:6px; background: var(--accent); color:#fff; text-decoration:none;
+    }
+    .btn:hover { background:#6366f1; }
 
     /* Responsive */
     @media (max-width: 900px) {
@@ -257,8 +176,24 @@
           </ul>
         </section>
 
+        <!-- Dynamic Projects (text only) -->
         <section id="projects" class="section">
           <h2>Projects</h2>
+          <div class="project-list">
+            <?php
+            include 'db.php';
+            $result = $conn->query("SELECT * FROM projects ORDER BY created_at DESC");
+            while ($row = $result->fetch_assoc()):
+            ?>
+              <div class="project-item">
+                <h3><?= htmlspecialchars($row['title']) ?></h3>
+                <p><?= nl2br(htmlspecialchars($row['description'])) ?></p>
+                <?php if ($row['file_path']): ?>
+                  <a href="<?= $row['file_path'] ?>" target="_blank" class="btn">View Work</a>
+                <?php endif; ?>
+              </div>
+            <?php endwhile; ?>
+          </div>
         </section>
       </main>
 
@@ -276,10 +211,10 @@
 
         <section id="contact" class="section contact">
           <h3>Contact</h3>
-          <form onsubmit="event.preventDefault();alert('Message sent (demo). Replace with your form handler)')">
-            <input type="text" placeholder="Your name" required>
-            <input type="email" placeholder="Your email" required>
-            <textarea rows="4" placeholder="Message" required></textarea>
+          <form>
+            <input type="text" name="name" placeholder="Your name" required>
+            <input type="email" name="email" placeholder="Your email" required>
+            <textarea name="message" rows="4" placeholder="Message" required></textarea>
             <button type="submit">Send Message</button>
           </form>
         </section>
@@ -291,16 +226,5 @@
       ©2025 Jan Russel S. Luceña — Designed in plain HTML/CSS.
     </footer>
   </div>
-
-  <!-- Smooth Scroll -->
-  <script>
-    document.querySelectorAll('a[href^="#"]').forEach(link => {
-      link.addEventListener('click', e => {
-        e.preventDefault();
-        const target = document.querySelector(link.getAttribute('href'));
-        if (target) target.scrollIntoView({ behavior: 'smooth' });
-      });
-    });
-  </script>
 </body>
 </html>
