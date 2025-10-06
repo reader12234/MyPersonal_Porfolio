@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   <div class="container">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
       <h1 style="margin:0;font-size:22px">Add Project</h1>
-      <a class="btn" href="/admin/index.php">← Back</a>
+      <a class="btn" href="/MyPersonal_Porfolio/admin/index.php">← Back</a>
     </div>
     <div class="card">
       <?php if ($error): ?><div class="error"><?php echo h($error); ?></div><?php endif; ?>
