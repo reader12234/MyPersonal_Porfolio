@@ -11,18 +11,7 @@ $projects = mysqli_query($conn, "SELECT id,title,description,file_path,created_a
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Admin — Projects</title>
-  <style>
-    body{font-family:Arial,sans-serif;background:#f5f5f5;margin:0}
-    .container{max-width:900px;margin:30px auto;background:#fff;border:1px solid #ddd;padding:20px;border-radius:6px}
-    header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-    .btn{display:inline-block;padding:8px 12px;border-radius:4px;text-decoration:none;color:#fff;background:#4f46e5}
-    .btn.gray{background:#666}
-    .btn.red{background:#c0392b}
-    table{width:100%;border-collapse:collapse}
-    th,td{padding:10px;border-bottom:1px solid #eee;vertical-align:top}
-    th{text-align:left;background:#fafafa}
-    .row-actions a{margin-right:6px}
-  </style>
+  <link rel="stylesheet" href="../style/admin.css" />
 </head>
 <body>
   <div class="container">

@@ -26,8 +26,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $safeName = uniqid('proj_', true) . ($ext ? ('.' . strtolower($ext)) : '');
             $dest = $uploadDir . $safeName;
             if (move_uploaded_file($_FILES['file']['tmp_name'], $dest)) {
-                if ($filePath && is_file(__DIR__ . '/..' . $filePath)) { @unlink(__DIR__ . '/..' . $filePath); }
-                $filePath = '/uploads/' . $safeName;
+                if ($filePath && is_file(__DIR__ . '/../' . $filePath)) { @unlink(__DIR__ . '/../' . $filePath); }
+                $filePath = 'uploads/' . $safeName;
             } else {
                 $error = 'Failed to upload file';
             }
@@ -51,17 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Edit Project</title>
-  <style>
-    body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;background:#0f172a;color:#e6eef8}
-    .container{max-width:800px;margin:32px auto;padding:24px}
-    a.btn,button.btn{display:inline-block;padding:.5rem .9rem;border-radius:8px;text-decoration:none;color:#fff;background:#4f46e5;border:none;cursor:pointer}
-    .card{background:#0b1220;padding:18px;border-radius:12px;box-shadow:0 8px 20px rgba(0,0,0,.4)}
-    .field{margin-bottom:12px}
-    input,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,.08);background:transparent;color:#e6eef8}
-    label{display:block;margin:6px 0;font-weight:600;color:#cfe8ff}
-    .muted{color:#6b7280}
-    .error{color:#f87171;margin-bottom:12px}
-  </style>
+  <link rel="stylesheet" href="../style/admin.css" />
 </head>
 <body>
   <div class="container">

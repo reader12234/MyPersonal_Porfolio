@@ -9,7 +9,7 @@ if ($id > 0) {
     if ($row = mysqli_fetch_assoc($res)) {
         mysqli_query($conn, "DELETE FROM projects WHERE id=" . $id);
         if (!empty($row['file_path'])) {
-            $p = __DIR__ . '/..' . $row['file_path'];
+            $p = __DIR__ . '/../' . $row['file_path'];
             if (is_file($p)) { @unlink($p); }
         }
     }
