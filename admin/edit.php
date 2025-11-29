@@ -22,12 +22,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if (!empty($_FILES['file']['name'])) {
             $uploadDir = __DIR__ . '/../uploads/';
             if (!is_dir($uploadDir)) { mkdir($uploadDir, 0755, true); }
-            $ext = pathinfo($_FILES['file']['name'], PATHINFO_EXTENSION);
-            $safeName = uniqid('proj_', true) . ($ext ? ('.' . strtolower($ext)) : '');
-            $dest = $uploadDir . $safeName;
+            $originalName = $_FILES['file']['name'];
+            $ext = pathinfo($originalName, PATHINFO_EXTENSION);
+            $baseName = pathinfo($originalName, PATHINFO_FILENAME);
+            // Sanitize filename: remove special characters, keep only alphanumeric, spaces, hyphens, underscores
+            $safeBaseName = preg_replace('/[^a-zA-Z0-9\s\-_]/', '', $baseName);
+            $safeBaseName = preg_replace('/\s+/', '_', trim($safeBaseName));
+            $safeName = $safeBaseName . ($ext ? ('.' . strtolower($ext)) : '');
+            
+            // Handle duplicate filenames
+            $counter = 1;
+            $finalName = $safeName;
+            while (file_exists($uploadDir . $finalName)) {
+                $finalName = $safeBaseName . '_' . $counter . ($ext ? ('.' . strtolower($ext)) : '');
+                $counter++;
+            }
+            
+            $dest = $uploadDir . $finalName;
             if (move_uploaded_file($_FILES['file']['tmp_name'], $dest)) {
                 if ($filePath && is_file(__DIR__ . '/../' . $filePath)) { @unlink(__DIR__ . '/../' . $filePath); }
-                $filePath = 'uploads/' . $safeName;
+                $filePath = 'uploads/' . $finalName;
             } else {
                 $error = 'Failed to upload file';
             }

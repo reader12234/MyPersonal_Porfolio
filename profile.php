@@ -1,3 +1,22 @@
+<?php
+require_once __DIR__ . '/db.php';
+session_start();
+
+// Get avatar path
+$avatarResult = mysqli_query($conn, "SELECT setting_value FROM profile_settings WHERE setting_key='avatar_path' LIMIT 1");
+$avatarRow = mysqli_fetch_assoc($avatarResult);
+$avatarPath = $avatarRow ? $avatarRow['setting_value'] : null;
+
+// Get Education, Services, and Contact
+$educationResult = mysqli_query($conn, "SELECT setting_value FROM profile_settings WHERE setting_key='education_text' LIMIT 1");
+$educationRow = mysqli_fetch_assoc($educationResult);
+$educationText = $educationRow ? $educationRow['setting_value'] : '';
+
+$servicesResult = mysqli_query($conn, "SELECT setting_value FROM profile_settings WHERE setting_key='services_text' LIMIT 1");
+$servicesRow = mysqli_fetch_assoc($servicesResult);
+$servicesText = $servicesRow ? $servicesRow['setting_value'] : '';
+
+?>
 <!doctype html>
 <html lang="en">
 <head>
@@ -14,25 +33,40 @@
         <strong>Jan Russel S. Luceña</strong>
         <nav>
           <a href="#about">About</a>
-          <a href="#skills">Skills</a>
+          <a href="index.php">Skills</a>
           <a href="#experience">Experiences</a>
           <a href="#projects">Projects</a>
           <a href="#contact">Contact</a>
         </nav>
       </div>
       <div class="links">
-        <a href="#">GitHub</a>
-        <a href="#">Twitter</a>
-        <a href="#">LinkedIn</a>
+        <a href="https://github.com/reader12234">GitHub</a>
+        <a href="index.php">Profile Card</a>
+        <a href="/MyPersonal_Porfolio/admin/login.php" title="Admin Panel" 
+        style="display:inline-flex;align-items:center;justify-content:center;width:24px;
+        height:24px;color: var(--muted); text-decoration: none;">
+
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+          </svg>
+        </a>
       </div>
     </header>
 
     <!-- Hero -->
     <section class="hero">
-      <div class="avatar">??</div>
+      <div class="avatar">
+        <?php if ($avatarPath): ?>
+          <img src="/MyPersonal_Porfolio/<?php echo htmlspecialchars($avatarPath); ?>" 
+          alt="Profile Picture" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">
+        <?php else: ?>
+          ??
+        <?php endif; ?>
+      </div>
       <div class="details">
         <h1>Jan Russel S. Luceña</h1>
-        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequuntur odit corrupti magnam aspernatur ex sit, dolores, eum optio reiciendis laboriosam repellat nisi dolorem provident nemo porro! Tempore et praesentium excepturi.</p>
         <p class="contact-info">
           <strong>Phone:</strong> 63496729253523 • 
           <strong>Email:</strong> <a href="mailto:[email protected]">[email protected]</a> • 
@@ -46,7 +80,13 @@
       <main>
         <section id="about" class="section">
           <h2>About</h2>
-          <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt consequatur adipisci perferendis? Harum facilis possimus commodi consectetur tempore cum, quisquam nostrum, aperiam, expedita quod explicabo omnis architecto unde? Reprehenderit, tenetur.</p>
+          <p>A highly motivated and results-driven Information Technology graduate from 
+            Camarines Sur Polytechnic Colleges. 
+            Eager to leverage foundational knowledge in modern web development to contribute to 
+            innovative projects. I am proficient in web 
+            development committed to continuous learning, and seeking an opportunity to grow as a 
+            Senior Web Developer / IT Support Specialist 
+            in a dynamic environment</p>
         </section>
 
         <section id="skills" class="section skills">
@@ -68,28 +108,18 @@
             <div class="progress"><i style="width:20%"></i></div>
           </div>
         </section>
-
-        <section id="experience" class="section">
-          <h2>Experiences</h2>
-          <ul class="timeline">
-            <li></li>
-          </ul>
-        </section>
-
         <!-- Dynamic Projects (text only) -->
         <section id="projects" class="section">
           <h2>Projects</h2>
           <div class="project-list">
             <?php
-            include 'db.php';
             $result = $conn->query("SELECT * FROM projects ORDER BY created_at DESC");
             while ($row = $result->fetch_assoc()):
             ?>
               <div class="project-item">
                 <h3><?= htmlspecialchars($row['title']) ?></h3>
-                <p><?= nl2br(htmlspecialchars($row['description'])) ?></p>
                 <?php if ($row['file_path']): ?>
-                  <a href="<?= $row['file_path'] ?>" target="_blank" class="btn">View Work</a>
+                  <a href="view_project.php?id=<?= (int)$row['id'] ?>" class="btn">View Work</a>
                 <?php endif; ?>
               </div>
             <?php endwhile; ?>
@@ -101,12 +131,48 @@
       <aside>
         <section class="section">
           <h3>Education</h3>
-          <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ducimus magnam harum quod odit voluptate sint neque, repudiandae expedita aut quia non nesciunt et rem ab qui, ex illo dolor. Quidem!</p>
+          <?php if ($educationText): ?>
+            <ul>
+              <?php 
+              $educationLines = array_filter(array_map('trim', explode("\n", $educationText)));
+              foreach ($educationLines as $line): 
+                if (!empty($line)):
+              ?>
+                <li><?php echo htmlspecialchars($line); ?></li>
+              <?php 
+                endif;
+              endforeach; 
+              ?>
+            </ul>
+          <?php else: ?>
+            <ul>
+              <li>Camarines Sur Polytechnic Colleges - Bachelor of Science in Information Technology</li>
+              <li>University of Saint Anthony - High School Diploma</li>
+            </ul>
+          <?php endif; ?>
         </section>
 
         <section class="section">
           <h3>Services</h3>
-          <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ducimus magnam harum quod odit voluptate sint neque, repudiandae expedita aut quia non nesciunt et rem ab qui, ex illo dolor. Quidem!</p>
+          <?php if ($servicesText): ?>
+            <ul>
+              <?php 
+              $servicesLines = array_filter(array_map('trim', explode("\n", $servicesText)));
+              foreach ($servicesLines as $line): 
+                if (!empty($line)):
+              ?>
+                <li><?php echo htmlspecialchars($line); ?></li>
+              <?php 
+                endif;
+              endforeach; 
+              ?>
+            </ul>
+          <?php else: ?>
+            <ul>
+              <li>Freelance</li>
+              <li>Tutoring</li>
+            </ul>
+          <?php endif; ?>
         </section>
 
         <section id="contact" class="section contact">
@@ -123,7 +189,7 @@
 
     <!-- Footer -->
     <footer>
-      ©2025 Jan Russel S. Luceña — Designed in plain HTML/CSS.
+      ©2025 Jan Russel S. Luceña.
     </footer>
   </div>
 </body>

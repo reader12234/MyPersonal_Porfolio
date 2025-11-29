@@ -10,8 +10,10 @@ if (!$conn) {
     die('DB connection error: ' . mysqli_connect_error());
 }
 
-function h($v) {
-    return htmlspecialchars($v ?? '', ENT_QUOTES, 'UTF-8');
+if (!function_exists('h')) {
+    function h($v) {
+        return htmlspecialchars($v ?? '', ENT_QUOTES, 'UTF-8');
+    }
 }
 
 

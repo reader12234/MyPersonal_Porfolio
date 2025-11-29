@@ -26,10 +26,32 @@ nav a { color: var(--muted); text-decoration: none; margin-left: 18px; font-weig
 /* Hero */
 .hero { display: flex; gap: 28px; align-items: center; margin-top: 28px; flex-wrap: wrap; }
 .avatar {
-  width: 140px; height: 140px; border-radius: 12px;
-  flex: 0 0 140px; background: linear-gradient(135deg, #0ea5a4, #4f46e5);
-  display: flex; align-items: center; justify-content: center;
-  font-weight: 700; font-size: 28px; color: #fff;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex: 0 0 120px;
+  background: #eee;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* optional: make avatar slightly smaller on narrow screens */
+@media (max-width: 600px) {
+  .avatar {
+    width: 80px;
+    height: 80px;
+    flex: 0 0 80px;
+  }
 }
 .hero h1 { margin: 0; font-size: 28px; }
 .hero p { margin: 6px 0; color: var(--muted); }
