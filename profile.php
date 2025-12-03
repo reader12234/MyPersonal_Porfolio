@@ -7,6 +7,11 @@ $avatarResult = mysqli_query($conn, "SELECT setting_value FROM profile_settings 
 $avatarRow = mysqli_fetch_assoc($avatarResult);
 $avatarPath = $avatarRow ? $avatarRow['setting_value'] : null;
 
+// Get Name
+$nameResult = mysqli_query($conn, "SELECT setting_value FROM profile_settings WHERE setting_key='name' LIMIT 1");
+$nameRow = mysqli_fetch_assoc($nameResult);
+$profileName = $nameRow ? $nameRow['setting_value'] : 'Your Name';
+
 // Get Education, Services, and Contact
 $educationResult = mysqli_query($conn, "SELECT setting_value FROM profile_settings WHERE setting_key='education_text' LIMIT 1");
 $educationRow = mysqli_fetch_assoc($educationResult);
@@ -30,11 +35,10 @@ $servicesText = $servicesRow ? $servicesRow['setting_value'] : '';
     <!-- Header -->
     <header>
       <div style="display:flex;gap:14px;align-items:center">
-        <strong>Jan Russel S. Luceña</strong>
+        <strong><?php echo htmlspecialchars($profileName); ?></strong>
         <nav>
           <a href="#about">About</a>
           <a href="index.php">Skills</a>
-          <a href="#experience">Experiences</a>
           <a href="#projects">Projects</a>
           <a href="#contact">Contact</a>
         </nav>
@@ -66,11 +70,11 @@ $servicesText = $servicesRow ? $servicesRow['setting_value'] : '';
         <?php endif; ?>
       </div>
       <div class="details">
-        <h1>Jan Russel S. Luceña</h1>
+        <h1><?php echo htmlspecialchars($profileName); ?></h1>
         <p class="contact-info">
-          <strong>Phone:</strong> 63496729253523 • 
-          <strong>Email:</strong> <a href="mailto:[email protected]">[email protected]</a> • 
-          Masoli, Bato, Camarines Sur
+          <strong>Phone:</strong> 63496729253523  
+          <strong>Email:</strong> janrlucena@my.cspc.edu.ph  
+          <strong >Address</strong> Masoli, Bato, Camarines Sur
         </p>
       </div>
     </section>

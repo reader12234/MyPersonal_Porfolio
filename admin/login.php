@@ -7,11 +7,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = trim($_POST['username'] ?? '');
     $password = $_POST['password'] ?? '';
 
-    $sql = "SELECT id, password FROM admins WHERE username='" . mysqli_real_escape_string($conn, $username) . "' LIMIT 1";
+    $sql = "SELECT id, username, full_name, password FROM admins WHERE username='" . mysqli_real_escape_string($conn, $username) . "' LIMIT 1";
     $res = mysqli_query($conn, $sql);
     if ($res && $row = mysqli_fetch_assoc($res)) {
         if ($password === $row['password']) {
             $_SESSION['admin_id'] = $row['id'];
+            $_SESSION['admin_username'] = $row['username'];
+            $_SESSION['admin_full_name'] = $row['full_name'];
             header('Location: /MyPersonal_Porfolio/admin/index.php');
             exit;
         }

@@ -1,12 +1,17 @@
 <?php
 require_once __DIR__ . '/../db.php';
 require_once __DIR__ . '/_auth.php';
+require_once __DIR__ . '/logger.php';
 require_admin();
 
 // Get current settings
 $avatarResult = mysqli_query($conn, "SELECT setting_value FROM profile_settings WHERE setting_key='avatar_path' LIMIT 1");
 $avatarRow = mysqli_fetch_assoc($avatarResult);
 $currentAvatar = $avatarRow ? $avatarRow['setting_value'] : null;
+
+$nameResult = mysqli_query($conn, "SELECT setting_value FROM profile_settings WHERE setting_key='name' LIMIT 1");
+$nameRow = mysqli_fetch_assoc($nameResult);
+$currentName = $nameRow ? $nameRow['setting_value'] : '';
 
 $introResult = mysqli_query($conn, "SELECT setting_value FROM profile_settings WHERE setting_key='intro_text' LIMIT 1");
 $introRow = mysqli_fetch_assoc($introResult);
@@ -26,12 +31,23 @@ $action = $_GET['action'] ?? 'list';
 $editingProjectId = null;
 $editingProject = null;
 
+// Handle Clear Logs
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['clear_logs'])) {
+    $logFile = __DIR__ . '/../log.txt';
+    if (file_exists($logFile)) {
+        @unlink($logFile);
+        $success = 'Logs cleared successfully!';
+        log_event('logs_cleared', []);
+    }
+}
+
 // Handle Project Deletion
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_project_id'])) {
     $deleteId = (int)$_POST['delete_project_id'];
-    $res = mysqli_query($conn, "SELECT file_path FROM projects WHERE id=" . $deleteId);
+    $res = mysqli_query($conn, "SELECT file_path, title FROM projects WHERE id=" . $deleteId);
     if ($row = mysqli_fetch_assoc($res)) {
         mysqli_query($conn, "DELETE FROM projects WHERE id=" . $deleteId);
+        log_event('project_deleted', ['project_id' => $deleteId, 'project_title' => $row['title']]);
         if (!empty($row['file_path'])) {
             $p = __DIR__ . '/../' . $row['file_path'];
             if (is_file($p)) { @unlink($p); }
@@ -97,10 +113,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['project_submit'])) {
                 // Update existing project
                 $sql = "UPDATE projects SET title='{$titleEsc}', description='{$descEsc}', file_path={$fileEsc} WHERE id={$projectId}";
                 $success = 'Project updated successfully!';
+                log_event('project_updated', ['project_id' => $projectId, 'title' => $title, 'has_file' => !is_null($filePath)]);
             } else {
                 // Create new project
                 $sql = "INSERT INTO projects (title, description, file_path) VALUES ('{$titleEsc}', '{$descEsc}', {$fileEsc})";
                 $success = 'Project created successfully!';
+                $insertId = mysqli_insert_id($conn);
+                log_event('project_created', ['project_id' => $insertId, 'title' => $title, 'has_file' => !is_null($filePath)]);
             }
             mysqli_query($conn, $sql);
             $action = 'list';
@@ -143,10 +162,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['settings_submit'])) {
                 mysqli_query($conn, "INSERT INTO profile_settings (setting_key, setting_value) VALUES ('avatar_path', '{$filePathEsc}') ON DUPLICATE KEY UPDATE setting_value='{$filePathEsc}'");
                 $currentAvatar = $filePath;
                 $success = 'Profile picture uploaded successfully!';
+                log_event('profile_avatar_updated', ['filename' => $safeName]);
             } else {
                 $error = 'Failed to upload file';
             }
         }
+    }
+    
+    if (isset($_POST['name'])) {
+        $nameText = trim($_POST['name']);
+        $nameEsc = mysqli_real_escape_string($conn, $nameText);
+        mysqli_query($conn, "INSERT INTO profile_settings (setting_key, setting_value) VALUES ('name', '{$nameEsc}') ON DUPLICATE KEY UPDATE setting_value='{$nameEsc}'");
+        $currentName = $nameText;
+        if ($success == '') {
+            $success = 'Name updated successfully!';
+        }
+        log_event('profile_name_updated', ['name' => $nameText]);
     }
     
     if (isset($_POST['intro_text'])) {
@@ -157,6 +188,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['settings_submit'])) {
         if ($success == '') {
             $success = 'Intro text updated successfully!';
         }
+        log_event('profile_intro_updated', ['intro_length' => strlen($introText)]);
     }
     
     if (isset($_POST['education_text'])) {
@@ -167,6 +199,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['settings_submit'])) {
         if ($success == '') {
             $success = 'Settings updated successfully!';
         }
+        log_event('profile_education_updated', ['entries_count' => count(array_filter(explode("\n", $educationText)))]);
     }
     
     if (isset($_POST['services_text'])) {
@@ -177,6 +210,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['settings_submit'])) {
         if ($success == '') {
             $success = 'Settings updated successfully!';
         }
+        log_event('profile_services_updated', ['entries_count' => count(array_filter(explode("\n", $servicesText)))]);
     }
 }
 
@@ -260,7 +294,10 @@ $projects = mysqli_query($conn, "SELECT id,title,description,file_path,created_a
   <div class="container">
     <header>
       <h1 style="margin:0;font-size:24px">Admin Dashboard</h1>
-      <div>
+      <div style="display:flex;align-items:center;gap:16px">
+        <?php if (isset($_SESSION['admin_full_name']) && !empty($_SESSION['admin_full_name'])): ?>
+          <span style="color:#6b7280;font-size:14px">Welcome, <strong><?php echo h($_SESSION['admin_full_name']); ?></strong></span>
+        <?php endif; ?>
         <a class="btn gray" href="/MyPersonal_Porfolio/profile.php" target="_blank">View Site</a>
         <a class="btn red" href="logout.php">Logout</a>
       </div>
@@ -272,13 +309,16 @@ $projects = mysqli_query($conn, "SELECT id,title,description,file_path,created_a
     <!-- Tab Navigation -->
     <div class="dashboard-tabs">
       <button class="tab-btn<?php echo $action === 'list' ? ' active' : ''; ?>" onclick="switchTab('projects', this)">
-        📋 Projects
+         Projects
       </button>
       <button class="tab-btn<?php echo $action === 'create' || $action === 'edit' ? ' active' : ''; ?>" onclick="switchTab('form', this)">
-        <?php echo $action === 'edit' ? '✏️ Edit Project' : '➕ New Project'; ?>
+        <?php echo $action === 'edit' ? ' Edit Project' : ' New Project'; ?>
       </button>
       <button class="tab-btn<?php echo $action === 'settings' ? ' active' : ''; ?>" onclick="switchTab('settings', this)">
-        ⚙️ Profile Settings
+         Profile Settings
+      </button>
+      <button class="tab-btn<?php echo $action === 'logs' ? ' active' : ''; ?>" onclick="switchTab('logs', this)">
+         Activity Logs
       </button>
     </div>
 
@@ -359,6 +399,12 @@ $projects = mysqli_query($conn, "SELECT id,title,description,file_path,created_a
       <h2 style="margin-top:0;font-size:20px">Profile Settings</h2>
       <div class="card">
         <form method="post" enctype="multipart/form-data">
+          <div class="field" style="margin-bottom:20px">
+            <label style="font-size:14px;font-weight:600">Your Name *</label>
+            <input name="name" type="text" value="<?php echo h($currentName); ?>" required style="font-size:14px;padding:10px;border:1px solid #d1d5db;border-radius:6px;width:100%;box-sizing:border-box;">
+            <div class="muted" style="font-size:12px;margin-top:4px">This name will be displayed on your profile</div>
+          </div>
+          
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:16px">
             <div>
               <h3 style="margin-top:0;font-size:16px">Profile Picture</h3>
@@ -408,6 +454,62 @@ $projects = mysqli_query($conn, "SELECT id,title,description,file_path,created_a
         </form>
       </div>
     </div>
+
+    <!-- Activity Logs Tab -->
+    <div id="logs" class="tab-content<?php echo $action === 'logs' ? ' active' : ''; ?>">
+      <h2 style="margin-top:0;font-size:20px">Activity Logs</h2>
+      <div class="card">
+        <div style="margin-bottom:16px;display:flex;gap:8px;justify-content:space-between;align-items:center">
+          <p style="margin:0;color:#6b7280;font-size:14px">All admin actions are logged here for audit and security purposes.</p>
+          <button class="btn red" onclick="clearLogs()" style="font-size:12px;padding:8px 12px">Clear Logs</button>
+        </div>
+        <div style="border:1px solid #e5e7eb;border-radius:6px;overflow:hidden;max-height:600px;overflow-y:auto;background:#f9fafb">
+          <table style="width:100%;border-collapse:collapse;font-size:13px">
+            <thead style="position:sticky;top:0;background:#f3f4f6;border-bottom:1px solid #e5e7eb">
+              <tr>
+                <th style="padding:12px;text-align:left;font-weight:600;color:#374151;width:18%">Time</th>
+                <th style="padding:12px;text-align:left;font-weight:600;color:#374151;width:15%">User</th>
+                <th style="padding:12px;text-align:left;font-weight:600;color:#374151;width:20%">Action</th>
+                <th style="padding:12px;text-align:left;font-weight:600;color:#374151;width:47%">Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php 
+                $logFile = __DIR__ . '/../log.txt';
+                if (file_exists($logFile)) {
+                  $lines = file($logFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+                  // Reverse to show latest first
+                  $lines = array_reverse($lines);
+                  
+                  if (count($lines) > 0) {
+                    foreach ($lines as $line) {
+                      $entry = json_decode($line, true);
+                      if ($entry) {
+                        $time = $entry['time'] ?? 'N/A';
+                        $user = $entry['user'] ?? 'N/A';
+                        $action = $entry['action'] ?? 'N/A';
+                        $details = isset($entry['details']) ? json_encode($entry['details']) : 'N/A';
+                        
+                        echo '<tr style="border-bottom:1px solid #e5e7eb;hover:background:#f3f4f6">';
+                        echo '<td style="padding:12px;color:#374151">' . htmlspecialchars($time) . '</td>';
+                        echo '<td style="padding:12px;color:#374151">' . htmlspecialchars($user) . '</td>';
+                        echo '<td style="padding:12px"><span style="background:#dbeafe;color:#1e40af;padding:4px 8px;border-radius:4px;font-size:12px;font-weight:500">' . htmlspecialchars($action) . '</span></td>';
+                        echo '<td style="padding:12px;color:#6b7280;font-family:monospace;font-size:12px;word-break:break-all">' . htmlspecialchars($details) . '</td>';
+                        echo '</tr>';
+                      }
+                    }
+                  } else {
+                    echo '<tr><td colspan="4" style="padding:24px;text-align:center;color:#9ca3af">No logs found yet</td></tr>';
+                  }
+                } else {
+                  echo '<tr><td colspan="4" style="padding:24px;text-align:center;color:#9ca3af">Log file not found</td></tr>';
+                }
+              ?>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -442,6 +544,20 @@ $projects = mysqli_query($conn, "SELECT id,title,description,file_path,created_a
       
       // Redirect to edit mode
       window.location.href = '?action=edit&id=' + projectId;
+    }
+    
+    function clearLogs() {
+      if (confirm('Are you sure you want to clear all logs? This action cannot be undone.')) {
+        fetch('', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: 'clear_logs=1'
+        }).then(() => {
+          window.location.reload();
+        });
+      }
     }
   </script>
 </body>
